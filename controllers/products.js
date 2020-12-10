@@ -8,7 +8,7 @@ const getAllProducts = async (request, response) => {
   return response.send(products)
 }
 
-const getProductsById = async (request, response) => {
+/* const getProductsById = async (request, response) => {
   const { id } = request.params
 
   const product = await models.Products.findOne({
@@ -23,6 +23,28 @@ const getProductsById = async (request, response) => {
   return product
     ? response.send(product)
     : response.sendStatus(404)
+} */
+
+const getProductsByFuzzy = async (request, response) => {
+  try {
+    const { name } = request.params
+
+    const foundProduct = await models.Products.findAll({
+      where: {
+        name: { [models.Op.like]: `%${name}%` },
+      }
+    })
+
+    return foundProduct
+      ? response.send(foundProduct)
+      : response.sendStatus(404)
+  } catch (error) {
+    return response.status(500).send('Unable to retrieve product, please try again')
+  }
 }
 
-module.exports = { getAllProducts, getProductsById }
+module.exports = {
+  getAllProducts,
+  // getProductsById,
+  getProductsByFuzzy
+}

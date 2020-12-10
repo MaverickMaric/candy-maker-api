@@ -8,7 +8,7 @@ const getAllManufacturers = async (request, response) => {
   return response.send(manufacturers)
 }
 
-const getManufacturerById = async (request, response) => {
+/* const getManufacturerById = async (request, response) => {
   const { id } = request.params
 
   const manufacturer = await models.Manufacturers.findOne({
@@ -23,7 +23,30 @@ const getManufacturerById = async (request, response) => {
   return manufacturer
     ? response.send(manufacturer)
     : response.sendStatus(404)
+} */
+
+const getManufacturerByFuzzy = async (request, response) => {
+  try {
+    const { name } = request.params
+
+    const foundManufacturer = await models.Manufacturers.findAll({
+      where: {
+        name: { [models.Op.like]: `%${name}%` },
+      }
+    })
+
+    return foundManufacturer
+      ? response.send(foundManufacturer)
+      : response.sendStatus(404)
+  } catch (error) {
+    return response.status(500).send('Unable to retrieve manufacturer, please try again')
+  }
 }
 
 
-module.exports = { getAllManufacturers, getManufacturerById }
+module.exports = {
+  getAllManufacturers,
+  // getManufacturerById,
+  getManufacturerByFuzzy
+}
+
